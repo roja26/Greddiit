@@ -1,0 +1,45 @@
+version: '3.2'
+
+services:
+
+  backend:
+    build:
+      dockerfile: Dockerfile
+      context: "./backend"
+    volumes:
+      - /app/node_modules
+      - ./backend:/app
+    ports:
+      - "3001:3001"
+    expose:
+      - "3001"
+    environment: 
+      - CHOKIDAR_USEPOLLING=true
+  
+  frontend:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    environment: 
+      - CHOKIDAR_USEPOLLING=true
+      
+  nginx:
+    depends_on:
+      - backend
+      - frontend
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "5000:80"
+    expose:
+      - "5000"
